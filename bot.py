@@ -14,8 +14,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import webapp2
+import datatime
+from google.appengine.api import datastore_types
 from google.appengine.api import xmpp
+from google.appengine.ext import ndb
+from google.appengine.ext.webapp import xmpp_handlers
+import webapp2
+from webapp2_extras import jinja2
+
+class Command(ndb.Model):
+	"""Model to hold questions"""
+
+def bare_jid(sender):
+	"""Identify the user by bare jid.
+
+	See http://wiki.xmpp.org/web/Jabber_Resources for more details.
+
+	Args:
+		sender: String; A jabber or XMPP sender.
+
+	Returns:
+		The bare Jabber ID of the sender.
+	"""
+	return sender.split('/')[0]
+
+class XmppSubscribeHandler(webapp2.RequestHandler):
+	def post(self):
+		sender = bare_jid(self.request.get('from'))
+		roster.add_contact(sender)
 
 class XmppPresenceHandler(webapp2.RequestHandler):
 	"""Handler class for XMPP status updates."""
@@ -52,7 +78,21 @@ class XMPPHandler(webapp2.RequestHandler):
 	def request(self):
 		print 'request...'
 
+class LatestHandler(webapp2.RequestHandler):
+	pass
+
+class XmppErrorHandler(webapp2.ReqeustHandler):
+	def post(self):
+		error_sender = self.request.get('from')
+		error_stanza = self.request.get('stanza')
+		logging.error('XMPP error received from %s (%s)', error_sender,
+				error_stanza)
+
+
 APPLICATION = webapp2.WSGIApplication([
-    ('/_ah/xmpp/presence/(available|unavailable)/', XmppPresenceHandler),
-    ('/_ah/xmpp/message/chat/', XmppHandler)
+	('/', LatestHandler),
+	('/_ah/xmpp/(subscribe|subscribed|unsubscribe|unsubscribed)', XmppSubscribeHandler),
+	('/_ah/xmpp/presence/(available|unavailable)/', XmppPresenceHandler),
+	('/_ah/xmpp/message/chat/', XmppHandler),
+	('/_ah/xmpp/error/', XmppErrorHandler),
 ], debug=True)
