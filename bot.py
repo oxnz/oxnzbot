@@ -14,20 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import datatime
+import datetime
 from google.appengine.api import datastore_types
 from google.appengine.api import xmpp
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import xmpp_handlers
 import webapp2
 from webapp2_extras import jinja2
+import logging
 
-class Command(ndb.Model):
+class Contact(ndb.Model):
 	"""Model to hold questions"""
+	pass
 
 def bare_jid(sender):
 	"""Identify the user by bare jid.
 
+	Example:
+		node@domain/resource will return node@domain
 	See http://wiki.xmpp.org/web/Jabber_Resources for more details.
 
 	Args:
@@ -39,9 +43,10 @@ def bare_jid(sender):
 	return sender.split('/')[0]
 
 class XmppSubscribeHandler(webapp2.RequestHandler):
-	def post(self):
+	def post(self, notification):
 		sender = bare_jid(self.request.get('from'))
-		roster.add_contact(sender)
+		logging.debug('XmppSubscribeHandler %s got notification %s' % (sender, notification))
+		#roster.add_contact(sender)
 
 class XmppPresenceHandler(webapp2.RequestHandler):
 	"""Handler class for XMPP status updates."""
@@ -55,33 +60,25 @@ class XmppPresenceHandler(webapp2.RequestHandler):
 			unavailable and will indicate the status of the user.
 		"""
 		sender = self.request.get('from')
-		im_from = datastore_types.IM('xmpp', bare_jid(sender))
-		suspend = (status == 'unavailable')
+		logging.debug('XmppPresenceHandler method post from %s status %s' % (sender, status))
 
-
-
-
-class XMPPHandler(webapp2.RequestHandler):
+class XmppHandler(webapp2.RequestHandler):
 	def post(self):
-		print 'post...'
+		logging.debug('XmppHandler post method')
 		message = xmpp.Message(self.request.POST)
 		if message.body[0:5].lower() == 'hello':
 			message.reply('Greetings!')
 		elif message.body[0:4].lower() == 'send':
 			xmpp.send_invite('yunxinyi@gmail.com')
-			status = xmpp.send_message('yunxinyi@gmail.com', 'sending')
+			to = 'yunxinyi@gmail.com'
+			status = xmpp.send_message(to, 'sending')
 			if not (status == xmpp.NO_ERROR):
 				print 'error while sending'
 		else:
-			print 'from:', message.sender, 'to:',  message.to
-			print 'body:', message.body
-	def request(self):
-		print 'request...'
+			message.reply('Are you kidding me?')
+			logging.debug('from %s content %s' % (message.sender, message.body))
 
-class LatestHandler(webapp2.RequestHandler):
-	pass
-
-class XmppErrorHandler(webapp2.ReqeustHandler):
+class XmppErrorHandler(webapp2.RequestHandler):
 	def post(self):
 		error_sender = self.request.get('from')
 		error_stanza = self.request.get('stanza')
@@ -91,8 +88,14 @@ class XmppErrorHandler(webapp2.ReqeustHandler):
 
 APPLICATION = webapp2.WSGIApplication([
 	('/', LatestHandler),
-	('/_ah/xmpp/(subscribe|subscribed|unsubscribe|unsubscribed)', XmppSubscribeHandler),
+	('/_ah/xmpp/subscription/(subscribe|subscribed|unsubscribe|unsubscribed)/', XmppSubscribeHandler),
 	('/_ah/xmpp/presence/(available|unavailable)/', XmppPresenceHandler),
 	('/_ah/xmpp/message/chat/', XmppHandler),
 	('/_ah/xmpp/error/', XmppErrorHandler),
 ], debug=True)
+
+def main():
+	run_wsgi_app(application)
+
+if __name__ == '__main__':
+	main()

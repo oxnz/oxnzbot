@@ -18,10 +18,11 @@ import webapp2
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        self.response.write('<h1>Under Construction...</h1>')
+	self.response.write('<form action="/" method="post"><p>name:<input type="text" name="nickname" /></p><input type="submit" value="Submit" /></form>')
     def post(self):
         self.response.write('got world!')
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
 ], debug=True)
