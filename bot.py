@@ -22,80 +22,110 @@ from google.appengine.ext.webapp import xmpp_handlers
 import webapp2
 from webapp2_extras import jinja2
 import logging
+from command import Command
 
-class Contact(ndb.Model):
-	"""Model to hold questions"""
-	pass
+BOSS_JID='yunxinyi@gmail.com'
 
 def bare_jid(sender):
-	"""Identify the user by bare jid.
+    """Identify the user by bare jid.
 
-	Example:
-		node@domain/resource will return node@domain
-	See http://wiki.xmpp.org/web/Jabber_Resources for more details.
+    Example:
+        node@domain/resource will return node@domain
+    See http://wiki.xmpp.org/web/Jabber_Resources for more details.
 
-	Args:
-		sender: String; A jabber or XMPP sender.
+    Args:
+        sender: String; A jabber or XMPP sender.
 
-	Returns:
-		The bare Jabber ID of the sender.
-	"""
-	return sender.split('/')[0]
+    Returns:
+        The bare Jabber ID of the sender.
+    """
+    return sender.split('/')[0]
 
 class XmppSubscribeHandler(webapp2.RequestHandler):
-	def post(self, notification):
-		sender = bare_jid(self.request.get('from'))
-		logging.debug('XmppSubscribeHandler %s got notification %s' % (sender, notification))
-		#roster.add_contact(sender)
+    def post(self, notification):
+        sender = bare_jid(self.request.get('from'))
+        logging.debug('XmppSubscribeHandler %s got notification %s' % (sender, notification))
+        #roster.add_contact(sender)
 
 class XmppPresenceHandler(webapp2.RequestHandler):
-	"""Handler class for XMPP status updates."""
+    """Handler class for XMPP status updates."""
 
-	def post(self, status):
-		"""POST handler for XMPP presence.
+    def post(self, status):
+        """POST handler for XMPP presence.
 
 
-		Args:
-			status: A string which will be either available or
-			unavailable and will indicate the status of the user.
-		"""
-		sender = self.request.get('from')
-		logging.debug('XmppPresenceHandler method post from %s status %s' % (sender, status))
+        Args:
+            status: A string which will be either available or
+            unavailable and will indicate the status of the user.
+        """
+        sender = bare_jid(self.request.get('from'))
+        logging.debug('XmppPresenceHandler method post from %s status %s' % (sender, status))
+#        if status == 'probe':
+#            xmpp.send_presence()
 
 class XmppHandler(webapp2.RequestHandler):
-	def post(self):
-		logging.debug('XmppHandler post method')
-		message = xmpp.Message(self.request.POST)
-		if message.body[0:5].lower() == 'hello':
-			message.reply('Greetings!')
-		elif message.body[0:4].lower() == 'send':
-			xmpp.send_invite('yunxinyi@gmail.com')
-			to = 'yunxinyi@gmail.com'
-			status = xmpp.send_message(to, 'sending')
-			if not (status == xmpp.NO_ERROR):
-				print 'error while sending'
-		else:
-			message.reply('Are you kidding me?')
-			logging.debug('from %s content %s' % (message.sender, message.body))
+    def __init__(self, request, response):
+        super(XmppHandler, self).__init__(request, response)
+
+    def post(self):
+        sender = bare_jid(self.request.get('from'))
+        if sender == BOSS_JID:
+            '''parse a new cmd and save it.'''
+            message = xmpp.Message(self.request.POST)
+            logging.info('BOSS command: %s' % message.body)
+            try:
+                recv, cmd = message.body.split('++')
+            except ValueError:
+                message.reply('Are you kidding me?')
+            else:
+                logging.info('caching comamnd %s for %s' % (cmd, recv))
+                Command.putCmdFor(cmd, recv)
+                message.reply('cached for [%s]' % recv)
+        #TODO: validate if sender a real server
+        elif sender != BOSS_JID:
+            '''send result to boss'''
+            logging.info('not BOSS, sending command')
+            result = self.request.get('result')
+            msg = 'result from server [%s]:\n%s' % (sender, result)
+            xmpp.send_message(BOSS_JID, msg)
+            cmd = Command.getCmdFor(sender)
+            if cmd == None:
+                logging.debug('server %s is sleep 4 seconds cause no command available' % sender)
+                self.response.write('sleep 4')
+            else:
+                self.response.write(cmd.command)
+                cmd.key.delete()
+        else:
+            '''neither boss nor server, do nothing'''
+            pass
+    def get(self):
+        self.response.write('<h1>Under Construction...</h1>')
 
 class XmppErrorHandler(webapp2.RequestHandler):
-	def post(self):
-		error_sender = self.request.get('from')
-		error_stanza = self.request.get('stanza')
-		logging.error('XMPP error received from %s (%s)', error_sender,
-				error_stanza)
+    def post(self):
+        error_sender = self.request.get('from')
+        error_stanza = self.request.get('stanza')
+        logging.error('XMPP error received from %s (%s)', error_sender,
+                error_stanza)
+        def get(self):
+            self.response.write('Error occured')
 
+class CapsidHandler(webapp2.RequestHandler):
+    def get(self):
+        self.response.write("getting Hello, capsid is serviceing")
+    def post(self):
+        self.response.write("posting: Hello, capsid is serviceing")
 
 APPLICATION = webapp2.WSGIApplication([
-	('/', LatestHandler),
-	('/_ah/xmpp/subscription/(subscribe|subscribed|unsubscribe|unsubscribed)/', XmppSubscribeHandler),
-	('/_ah/xmpp/presence/(available|unavailable)/', XmppPresenceHandler),
-	('/_ah/xmpp/message/chat/', XmppHandler),
-	('/_ah/xmpp/error/', XmppErrorHandler),
-], debug=True)
+    ('/', CapsidHandler),
+    ('/_ah/xmpp/subscription/(subscribe|subscribed|unsubscribe|unsubscribed)/', XmppSubscribeHandler),
+    ('/_ah/xmpp/presence/(probe|available|unavailable)/', XmppPresenceHandler),
+    ('/_ah/xmpp/message/chat/', XmppHandler),
+    ('/_ah/xmpp/error/', XmppErrorHandler),
+    ], debug=True)
 
 def main():
-	run_wsgi_app(application)
+    run_wsgi_app(application)
 
 if __name__ == '__main__':
-	main()
+    main()
