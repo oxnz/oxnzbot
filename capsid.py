@@ -19,9 +19,15 @@ import webapp2
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.write('<h1>Under Construction...</h1>')
-	self.response.write('<form action="/" method="post"><p>name:<input type="text" name="nickname" /></p><input type="submit" value="Submit" /></form>')
+	self.response.write('''
+	<form action="/_ah/xmpp/message/chat/" method="post">
+	<p>from:<input type="text" name="from" /></p>
+	<p>to:<input type="text" name="to" /></p>
+	<p>body:<input type="text" name="body" /></p>
+	<p>stanza:<input type="text" name="stanza" /></p>
+	<input type="submit" value="Submit" /></form>''')
     def post(self):
-        self.response.write('got world!')
+        self.response.write('post: got world!')
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
