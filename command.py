@@ -7,10 +7,10 @@ class Command(ndb.Model):
     stamp = ndb.DateTimeProperty(required=True, auto_now_add=True)
 
     @classmethod
-    def getCmdFor(cls, receiver):
-        query = cls.query(cls.receiver == receiver)
+    def getCmdFor(cls, recv):
+        query = cls.query(cls.receiver == recv)
         query.order(cls.stamp)
-        cmdList = query.fetch(1)
+        cmdList = query.fetch()
         if len(cmdList) == 0:
             return None
         else:

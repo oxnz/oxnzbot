@@ -64,9 +64,6 @@ class XmppPresenceHandler(webapp2.RequestHandler):
 #            xmpp.send_presence()
 
 class XmppHandler(webapp2.RequestHandler):
-    def __init__(self, request, response):
-        super(XmppHandler, self).__init__(request, response)
-
     def post(self):
         sender = bare_jid(self.request.get('from'))
         if sender == BOSS_JID:
@@ -76,13 +73,14 @@ class XmppHandler(webapp2.RequestHandler):
             try:
                 recv, cmd = message.body.split('++')
             except ValueError:
-                message.reply('Are you kidding me?')
+                message.reply('Are you kidding me? Why are you saying "%s"' % message.body)
             else:
                 logging.info('caching comamnd %s for %s' % (cmd, recv))
                 Command.putCmdFor(cmd, recv)
                 message.reply('cached for [%s]' % recv)
         #TODO: validate if sender a real server
         elif sender != BOSS_JID:
+            return
             '''send result to boss'''
             logging.info('not BOSS, sending command')
             result = self.request.get('result')
@@ -111,13 +109,28 @@ class XmppErrorHandler(webapp2.RequestHandler):
             self.response.write('Error occured')
 
 class CapsidHandler(webapp2.RequestHandler):
+    '''Handle command'''
     def get(self):
-        self.response.write("getting Hello, capsid is serviceing")
+        sender = self.request.get('from')
+        logging.info('get method of CapsidHandler sender: %s' % sender)
+        cmd = Command.getCmdFor(sender)
+        if cmd == None:
+            self.response.write('')
+        else:
+            self.response.write(cmd.command)
+            cmd.key.delete()
     def post(self):
+        sender = self.request.get('from')
+        command = self.request.get('command')
+        status = self.request.get('result')
+        output = self.request.get('output')
+        msg = '[%s]$ %s\n%s\n(status=%s)' % (sender, command, status, output)
+        #TODO: add checking if the msg delivery success
+        xmpp.send_message(BOSS_JID, msg)
         self.response.write("posting: Hello, capsid is serviceing")
 
 APPLICATION = webapp2.WSGIApplication([
-    ('/', CapsidHandler),
+    ('/_ah/xmpp/__0x01379/', CapsidHandler),
     ('/_ah/xmpp/subscription/(subscribe|subscribed|unsubscribe|unsubscribed)/', XmppSubscribeHandler),
     ('/_ah/xmpp/presence/(probe|available|unavailable)/', XmppPresenceHandler),
     ('/_ah/xmpp/message/chat/', XmppHandler),
