@@ -1,8 +1,15 @@
+#!/usr/bin/env python
+#coding: utf-8
+#@author: 0xnz
+#@update: Mon Sep 30 14:04:48 CST 2013
+
 import urllib
 import urllib2
 import socket
 import cookielib
 import commands
+import os
+import string
 
 FROM = 'a@b.com'
 
@@ -51,6 +58,21 @@ def test(remote=True):
         print hpost(lurl, data, method='GET', proxy=False)
         print hpost(lurl, data, method='POST', proxy=False)
 
-if __name__ == '__main__':
+def auth(euid=0):
+    try:
+        os.seteuid(euid)
+    except OSError, e:
+        '''permission denied'''
+        path = "osascript -e \'do shell script \"%s %s\" with administrator privileges\'" % ('python', os.path.abspath(__file__))
+        os.system(path)
+        exit()
+
+def main():
+    if os.geteuid() != 0:
+        auth(0)
+    print 'starting test...'
     #test(False)
-    test()
+    #test()
+
+if __name__ == '__main__':
+    main()
