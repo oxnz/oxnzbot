@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 #coding: utf-8
-#@author: 0xnz
-#@update: Mon Sep 30 14:04:48 CST 2013
+#Last-update: 2013-10-01 09:16:36
+
+__author__ = '0xnz'
+__version__ '0.1'
 
 import urllib
 import urllib2
@@ -75,4 +77,5 @@ def main():
     #test()
 
 if __name__ == '__main__':
+    #TODO: import SimpleXMLRPCServer
     main()

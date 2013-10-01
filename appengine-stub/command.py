@@ -1,6 +1,9 @@
 import logging
 from google.appengine.ext import ndb
 
+__author__ = '0xnz <yunxinyi@gmail.com>'
+__version__ = '0.1'
+
 class Command(ndb.Model):
     receiver = ndb.StringProperty(required=True)
     command = ndb.StringProperty(required=True)

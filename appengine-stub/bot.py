@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+__author__ = '0xnz <yunxinyi@gmail.com>'
+__version__ = '0.1'
+
 import datetime
 from google.appengine.api import (datastore_types, xmpp)
 from google.appengine.ext import ndb

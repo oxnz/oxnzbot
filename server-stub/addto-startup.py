@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #coding: utf-8
 
+__author__ = '0xnz'
 __version__ = '0.1'
 
 import os
@@ -16,7 +17,7 @@ def add_startup_linux():
 
 def add_startup_darwin():
     print 'add startup item for darwin'
-    pass
+    plist = '/Library/LaunchDaemons/org.oxnzbot.plist'
 
 def add_startup_windows():
     pass

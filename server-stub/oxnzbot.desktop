@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Categories=Network;Utility
+Exec=/usr/bin/env python FIXME
+Icon=/oxnzbot.png
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=oxnzbot
+Comment=Oxnzbot GTK Launcher
