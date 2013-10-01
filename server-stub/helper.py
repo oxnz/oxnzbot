@@ -7,6 +7,6 @@ __all__ = ['Helper']
 class Helper():
     
     @classmethod
-    def sudo(cls, abspath):
-        cmd = '''osascript -e 'do shell script \"{0}\" with root privileges'''.format(abspath)
+    def sudo(cls, command):
+        cmd = """osascript -e 'do shell script "{0}" with administrator privileges'""".format(command)
         os.system(cmd)
