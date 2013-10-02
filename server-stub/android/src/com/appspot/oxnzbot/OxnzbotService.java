@@ -1,5 +1,10 @@
 package com.appspot.oxnzbot;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -46,5 +51,30 @@ public class OxnzbotService extends Service {
 	public void onStart(Intent intent, int startid) {
 		Toast.makeText(this, "onStart()", Toast.LENGTH_LONG).show();
 		Log.d(TAG, "onStart()");
+		try {
+		String command = retriveCommand("http://oxnzbot.appspot.com/_ah/xmpp");
+		Log.d(TAG, "retrive command:" + command);
+		} catch (Exception e) {
+			Log.d(TAG, e.getMessage());
+		}
+	}
+	
+	public String retriveCommand(String url) {
+		String result = null;
+		try {
+			HttpGet request = new HttpGet(url);
+			HttpResponse response = new DefaultHttpClient().execute(request);
+			if (response.getStatusLine().getStatusCode() != 200) {
+				Log.e(TAG, "connection error");
+			}
+			else {
+				result = EntityUtils.toString(response.getEntity());
+				Log.d(TAG, "response result:" + result);
+			}
+		} catch (Exception e) {
+			Log.e(TAG, "exceptoin:" + e.getLocalizedMessage());
+			Log.d(TAG, e.getMessage());
+		}
+		return result;
 	}
 }
