@@ -45,6 +45,8 @@ def bare_jid(sender):
     return sender.split('/')[0]
 
 class XmppSubscribeHandler(webapp2.RequestHandler):
+    """Handler class for user's subscribe option.
+    """
     def post(self, notification):
         sender = bare_jid(self.request.get('from'))
         logging.debug('XmppSubscribeHandler %s got notification %s' % (sender, notification))
