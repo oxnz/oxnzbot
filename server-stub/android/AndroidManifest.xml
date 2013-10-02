@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.appspot.oxnzbot.MainActivity"
+            android:name="com.appspot.oxnzbot.OxnzbotActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,18 +26,17 @@
         </activity>
 
 		<service
-			android:name="com.appspot.oxnzbot.LocalWordService"
+			android:name="com.appspot.oxnzbot.OxnzbotService"
 			android:icon="@drawable/ic_launcher"
 			android:label="@string/service_name">
 		</service>
 
-		<receiver android:name="MyScheduleReceiver">
+		<receiver android:name="OxnzbotBroadcastReceiver">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 			</intent-filter>
 		</receiver>
-		<receiver android:name="MyStartServiceReceiver">
-		</receiver>
+		
     </application>
 
 </manifest>

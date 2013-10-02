@@ -3,9 +3,8 @@
 
     <string name="app_name">Oxnzbot</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="hello">&quot;Hello&quot;</string>
-    <string name="button">Button</string>
-    <string name="service_name">LocalWordService</string>
+    <string name="service_name">OxnzbotService</string>
+    <string name="startButton">Start</string>
+    <string name="stopButton">Stop</string>
 
 </resources>
