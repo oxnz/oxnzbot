@@ -70,6 +70,11 @@ public class OxnzbotService extends Service {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
+			try {
+				HttpPost post = new HttpPost(url);
+				post.setEntity(httpEntity);
+				HttpClient
 		}
 	};
 	
