@@ -40,11 +40,15 @@ class ExecCommandThread(threading.Thread):
         self.__resultPool = resultPool
     def run(self):
         print 'exec command run'
-        if len(self.__commandPool) > 0:
-            cmd = self.__commandPool[0]
-            result = commands.getstatusoutput(cmd)
-            self.__resultPool.append(result)
-            del self.__commandPool[0]
+        while True:
+            if len(self.__commandPool) > 0:
+                cmd = self.__commandPool[0]
+                result = commands.getstatusoutput(cmd)
+                self.__resultPool.append(result)
+                del self.__commandPool[0]
+            else:
+                print 'no cmd avaialbe'
+                time.sleep(1)
 
 
 class PostResultThread(threading.Thread):
@@ -53,9 +57,10 @@ class PostResultThread(threading.Thread):
         self.__resultPool = resultPool
     def run(self):
         print 'post result run...'
-        while len(self.__resultPool) > 0:
-            result = self.__resultPool.pop()
-            print 'result:', result
+        while True:
+            while len(self.__resultPool) > 0:
+                result = self.__resultPool.pop()
+                print 'result:', result
 
 class OxnzbotServer(object):
     state = Enum(["START", "STOP"])
