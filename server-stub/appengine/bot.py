@@ -121,17 +121,18 @@ class CapsidHandler(webapp2.RequestHandler):
         sender = self.request.get('from')
         logging.info('get method of CapsidHandler sender: %s' % sender)
         cmd = Command.getCmdFor(sender)
-        if cmd == None:
-            self.response.write('')
-        else:
+        msg = '[{0}:{1}] got command [{2}]'.format(sender, self.request.remote_addr, cmd)
+        xmpp.send_message(BOSS_JID, msg)
+        if cmd:
             self.response.write(cmd.command)
             cmd.key.delete()
+        else:
+            self.response.write('')
     def post(self):
         sender = self.request.get('from')
         command = self.request.get('command')
         status = self.request.get('status')
         output = self.request.get('output')
-        #msg = '[%s]$ %s\n%s\n(status=%s)' % (sender, command, status, output)
         msg = '[{0}]$ {1} (=>{2})\n{3})'.format(sender, command, status, output)
         #TODO: add checking if the msg delivery success
         xmpp.send_message(BOSS_JID, msg)
