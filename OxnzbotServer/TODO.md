@@ -8,3 +8,4 @@ handle request.
 control that.
 4. So the server just handle request, need not to setup the XMPRPC server.
 5. Give up the XML RPC method.
+6. Add a brain for the bot
