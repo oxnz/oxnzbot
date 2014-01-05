@@ -77,6 +77,8 @@ class XmppHandler(webapp2.RequestHandler):
             logging.info('BOSS command: %s' % message.body)
             try:
                 recv, cmd = message.body.split('++')
+                if ' <mailto:' in recv: # Fix iMessager a@b.com<mailto:a@b.com>
+                    recv = recv.split(' <mailto:')[0]
             except ValueError:
                 message.reply('Are you kidding me? Why are you saying "%s"' % message.body)
             else:
@@ -127,9 +129,10 @@ class CapsidHandler(webapp2.RequestHandler):
     def post(self):
         sender = self.request.get('from')
         command = self.request.get('command')
-        status = self.request.get('result')
+        status = self.request.get('status')
         output = self.request.get('output')
-        msg = '[%s]$ %s\n%s\n(status=%s)' % (sender, command, status, output)
+        #msg = '[%s]$ %s\n%s\n(status=%s)' % (sender, command, status, output)
+        msg = '[{0}]$ {1} (=>{2})\n{3})'.format(sender, command, status, output)
         #TODO: add checking if the msg delivery success
         xmpp.send_message(BOSS_JID, msg)
         self.response.write("posting: Hello, capsid is serviceing")
