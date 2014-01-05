@@ -37,5 +37,3 @@ if (!responseData) {
 // data
 NSString *responseString = [[NSString alloc] initWithData: responseData];
 NSLog(@"response: %@", responseString);
-
-
