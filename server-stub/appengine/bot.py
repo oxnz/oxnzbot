@@ -86,22 +86,8 @@ class XmppHandler(webapp2.RequestHandler):
                 Command.putCmdFor(cmd, recv)
                 message.reply('cached for [%s]' % recv)
         #TODO: validate if sender a real server
-        elif sender != BOSS_JID:
-            return
-            '''send result to boss'''
-            logging.info('not BOSS, sending command')
-            result = self.request.get('result')
-            msg = 'result from server [%s]:\n%s' % (sender, result)
-            xmpp.send_message(BOSS_JID, msg)
-            cmd = Command.getCmdFor(sender)
-            if cmd == None:
-                logging.debug('server %s is sleep 4 seconds cause no command available' % sender)
-                self.response.write('sleep 4')
-            else:
-                self.response.write(cmd.command)
-                cmd.key.delete()
         else:
-            '''neither boss nor server, do nothing'''
+            '''not boss, do nothing'''
             pass
     def get(self):
         self.response.write('<h1>Under Construction...</h1>')
@@ -133,7 +119,8 @@ class CapsidHandler(webapp2.RequestHandler):
         command = self.request.get('command')
         status = self.request.get('status')
         output = self.request.get('output')
-        msg = '[{0}]$ {1} (=>{2})\n{3})'.format(sender, command, status, output)
+        msg = '[%s]$ %s (=>%s)\n%s' % (sender, command, status, output)
+        #msg = '[{0}]$ {1} (=>{2})\n{3})'.format(sender, command, status, output)
         #TODO: add checking if the msg delivery success
         xmpp.send_message(BOSS_JID, msg)
         self.response.write("posting: Hello, capsid is serviceing")
