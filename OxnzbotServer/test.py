@@ -13,6 +13,31 @@ import commands
 import os
 import string
 
+class Server(object):
+    def __init__(self, ID, url):
+        super(Server, self).__init__()
+        self.__id = ID
+        self.__url = url
+    def pull(self):
+        pass
+    def exec_(self, cmd):
+        pass
+    def push(self, data):
+        pass
+    def loop(self):
+        while True:
+            try:
+                cmd = self.pull()
+                (ret, out) = self.exec_(cmd)
+                self.push({
+                    'from': self.__id,
+                    'command': cmd,
+                    'status': str(status),
+                    'output': out,
+                })
+            except KeyboardInterrupt:
+                return
+
 FROM = 'a@b.com'
 
 def hpost(url, data, method='POST', proxy=True):
@@ -29,36 +54,38 @@ def hpost(url, data, method='POST', proxy=True):
     return resp.read()
 
 lurl = 'http://localhost:8080/_ah/xmpp/__0x01379/?from=a@b.com'
-ourl = 'http://oxnzbot.appspot.com'
-xgurl = 'http://oxnzbot.appspot.com/_ah/xmpp/__0x01379/?from=a@b.com'
-xpurl = 'http://oxnzbot.appspot.com/_ah/xmpp/__0x01379/'
-murl = 'http://oxnzbot.appspot.com/_ah/xmpp/message/chat/'
+ourl = 'https://oxnzbot.appspot.com'
+xgurl = 'https://oxnzbot.appspot.com/_ah/xmpp/__0x01379/?from=a@b.com'
+xpurl = 'https://oxnzbot.appspot.com/_ah/xmpp/__0x01379/'
+murl = 'https://oxnzbot.appspot.com/_ah/xmpp/message/chat/'
 burl = 'http://www.baidu.com/'
 
 def test(remote=True):
-    if remote:
-        while True:
-            cmd = hpost(xgurl, None, method='GET', proxy=True)
-            if cmd == '':
-                print 'no command available'
-            else:
-                print 'executing command: %s' % cmd
-                (status, output) = commands.getstatusoutput(cmd)
-                data = urllib.urlencode({
-                    'from': FROM,
-                    'command': cmd,
-                    'status': str(status),
-                    'output': output,
-                })
-                # check if the server delivery msg to boss ok
-                ret = hpost(xpurl, data, method='POST', proxy=True)
-                if ret == '__0x0000':
-                    break
-                else:
-                    pass
-    else:
-        print hpost(lurl, data, method='GET', proxy=False)
-        print hpost(lurl, data, method='POST', proxy=False)
+    while True:
+        url = xgurl
+        if not remote:
+            url = lurl
+        print "asking server: %s" % url
+        cmd = hpost(url, None, method='GET', proxy=False)
+        if cmd == '':
+            print 'no command available'
+        else:
+            print 'executing command: %s' % cmd
+            #(status, output) = commands.getstatusoutput(cmd)
+            # check if the server delivery msg to boss ok
+            #ret = hpost(xpurl, data, method='POST', proxy=False)
+            #if ret == '__0x0000':
+            #    pass
+            #else:
+            #    pass
+#    data = urllib.urlencode({
+#        'from': FROM,
+#        'command': cmd,
+#        'status': str(status),
+#        'output': output,
+#    })
+#    print hpost(lurl, data, method='GET', proxy=False)
+#    print hpost(lurl, data, method='POST', proxy=False)
 
 def auth(euid=0):
     try:
@@ -71,10 +98,11 @@ def auth(euid=0):
 
 def main():
     if os.geteuid() != 0:
-        auth(0)
+        #auth(0)
+        pass
     print 'starting test...'
     #test(False)
-    #test()
+    test()
 
 if __name__ == '__main__':
     #TODO: import SimpleXMLRPCServer

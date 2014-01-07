@@ -3,7 +3,7 @@
 int getResponse() {
 	NSError *err;
 	// URL to which data is posted
-	NSURL *url = [NSURL URLWithString: @"http://oxnzbot.appspot.com/_ah/xmpp/"];
+	NSURL *url = [NSURL URLWithString: @"https://oxnzbot.appspot.com/_ah/xmpp/__0x1379/?from=a@b.com"];
 	// Key value to post
 	NSString *postData = @"key1=value1&key2=value2";
 	NSString *postLength = [NSString stringWithFormat: @"%d",
@@ -38,7 +38,8 @@ int getResponse() {
 	// This is just for ease of use; you can choose to do something
 	// else with the data
 	NSLog(@"recieved %ld bytes", [responseData length]);
-	NSString *responseString = [[NSString alloc] initWithData: responseData];
+	NSString *responseString = [[NSString alloc] initWithData: responseData
+													 encoding: NSUTF8StringEncoding];
 	NSLog(@"response: %@", responseString);
 	return 0;
 }

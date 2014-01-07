@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--Build file for OxnzBotServer-->
+<project name="OxnzBotServer" default="test" basedir=".">
+	<target name="test" depends="jar">
+		<java dir="${basedir}" jar="${basedir}/OxnzBotServer.jar"
+			fork="true" failonerror="true">
+		</java>
+	</target>
+	<target name="compile">
+		<javac srcdir="src" destdir="build" encoding="utf-8"
+			includeantruntime="false" debug="true"/>
+	</target>
+	<target name="jar" depends="compile" description="archive class file">
+		<jar destfile="OxnzBotServer.jar" basedir="${basedir}/build">
+			<manifest>
+				<attribute name="Main-Class"
+					value="io.github.oxnz.OxnzBotServer.OxnzBotServer" />
+			</manifest>
+		</jar>
+	</target>
+	<target name="clean" description="clean working directory">
+		<delete dir="${basedir}/bulid" />
+	</target>
+</project>
