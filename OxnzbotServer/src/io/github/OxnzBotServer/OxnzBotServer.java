@@ -61,6 +61,11 @@ public class OxnzBotServer implements Observer {
 	class CmdPullServer extends Observable implements Runnable {
 		private List<Command> resultPool = new ArrayList<Command>();
 		private HttpsURLConnection conn;
+		private String url;
+		public void setURL(String url_) {
+			url = url_;
+			url += "oxnz";
+		}
 		private Command pull() {
 			try {
 				System.out.println("pulling ...");
@@ -88,10 +93,14 @@ public class OxnzBotServer implements Observer {
 	class RetPushServer implements Runnable, Observer {
 		private List<Command> cmdPool = new ArrayList<Command>();
 		private HttpsURLConnection conn;
+		private String url;
 		public void update(Observable ob, Object obj) {
 			System.out.println(Helper.ts() + ": pusher recieved notify:\n"
 					+ obj);
 			cmdPool.add((Command)obj);
+		}
+		public void setURL(String url_) {
+			url = url_;
 		}
 		private void push(Command cmd) {
 			try {
@@ -187,6 +196,9 @@ public class OxnzBotServer implements Observer {
 		CmdPullServer pullServer = new CmdPullServer();
 		RetPushServer pushServer = new RetPushServer();
 		ExecuteServer execServer = new ExecuteServer();
+		pullServer.setURL(
+				"https://oxnzbot.appspot.com/_ah/xmpp/__0x01379/?from=");
+		pushServer.setURL("https://oxnzbot.appspot.com/_ah/xmpp/__0x01379");
 		pullServer.addObserver(execServer);
 		execServer.addObserver(pushServer);
 		Thread pullThread = new Thread(pullServer);
