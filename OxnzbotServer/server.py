@@ -19,6 +19,7 @@ class Server(object):
         super(Server, self).__init__()
         self.__id = os.getlogin()
         self.__url = 'https://oxnzbot.appspot.com/_ah/xmpp/__0x01379/'
+        self.__url = 'https://localhost/OxnzbotServer.php'
     def pull(self):
         succ = False
         while not succ:
