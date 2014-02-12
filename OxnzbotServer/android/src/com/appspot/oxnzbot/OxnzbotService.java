@@ -24,10 +24,10 @@ public class OxnzbotService extends Service {
 	}
 	
 	/** 
-     * Õâ¸öº¯ÊýµÄ·µ»ØÖµ»áµ±×÷²ÎÊý´«µ½ 
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
      * public void onServiceConnected(ComponentName name, IBinder binder) 
-     * IBinder IÊÇÖ¸interface£¬Ò»°ãÎÒÃÇ»áÔÚserviceÀàÊµÏÖÒ»¸öBinder£¬ÕâÑù 
-     * Í¨¹ýÕâ¸öBinder£¬ÎÒÃÇ¿ÉÒÔÓëservice½»»¥¡£ 
+     * IBinder Iï¿½ï¿½ï¿½ï¿½interfaceï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½serviceï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Binderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Binderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½serviceï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
      */ 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -72,9 +72,12 @@ public class OxnzbotService extends Service {
 			}
 
 			try {
-				HttpPost post = new HttpPost(url);
-				post.setEntity(httpEntity);
-				HttpClient
+				//HttpPost post = new HttpPost(url);
+				//post.setEntity(httpEntity);
+				//HttpClient
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	};
 	
